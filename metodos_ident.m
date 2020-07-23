@@ -147,7 +147,35 @@ function analyze_residuals(data, sys_id, sampling_frequency)
 	%# INPUT sys_id( - ):
 	%# INPUT sampling_frequency(float):
     %% Analisis de residuos
+    %% Analisis de residuos
+    e = resid(sys_id, data);
 
+    figure(4); 
+    % Auto-correlación del residuo
+    subplot(2, 2, 1); 
+    [Rmm, lags] = xcorr(e.y, 'coeff');
+    Rmm = Rmm(lags>0); lags = lags(lags>0);
+    plot(lags/sampling_frequency,Rmm); xlabel('Lag [s]');
+    title('Auto-corr. residuo');
+
+    % Correlación del residuo con la salida
+    subplot(2, 2, 2); 
+    [Rmm, lags] = xcorr(e.y, data.OutputData, 'coeff');
+    Rmm = Rmm(lags>0); lags = lags(lags>0);
+    plot(lags/sampling_frequency, Rmm); xlabel('Lag [s]');
+    title('Corr. residuo/salida');
+
+    % Histograma del residuo
+    subplot(2, 2, 3); 
+    histfit(e.y); title('Histograma residuo');
+
+    % Correlación del residuo con la salida
+    subplot(2, 2, 4); 
+    [Rmm, lags] = xcorr(e.y, data.InputData, 'coeff');
+    Rmm = Rmm(lags>0); lags = lags(lags>0);
+    plot(lags/sampling_frequency, Rmm); xlabel('Lag [s]');
+    title('Corr. residuo/entrada');
+    print -dsvg G1EJ1img4.svg
 end
 
 function validate_identifications(data, Gzi, Gzi_mc)
