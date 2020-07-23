@@ -49,7 +49,8 @@ function noisy = add_white_noise_to_func(clean_signal, noise_amplitude)
 	%# INPUT noise_amplitude: (float) amplitud de la señal de ruido
 	%# OUTPUT noisy (simbólico) señal con ruido agregado
 	%#
-
+    noise = noise_amplitude * randn(size(clean_signal));
+    noisy = clean_signal + noise;
 end
 
 function [data_ident, data_validation] = generate_ident_package(input_signal, output_signal, sample_time, ident_proportion, plot_package)
