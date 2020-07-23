@@ -185,5 +185,16 @@ function validate_identifications(data, Gzi, Gzi_mc)
 	%# INPUT data(paquete): 
 	%# INPUT Gzi(tf):
 	%# INPUT Gzi_mc(tf):
-
+    data_size = size(data);
+    [y_sys, fit] = compare(data, Gzi);
+    [y_mc, fit_mc] = compare(data, Gzi_mc);
+    t = (1:data_size);
+    
+    figure(3);
+    plot(t, y_sys.OutputData, 'r', t, y_mc.OutputData, 'g--', t, data.OutputData, 'b-.');
+    title('Validación de resultados');
+    set(gca, 'XTickLabel', 60:10:data_size);
+    xlabel('Tiempo [s]');
+    legend(sprintf('ARX (%2.2f)', fit), sprintf('RLS (%2.2f)', fit_mc), 'Salida', 'Location', 'SouthEast');
+    print -dsvg G1EJ1img3.svg
 end
