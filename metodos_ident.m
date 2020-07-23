@@ -86,7 +86,34 @@ function Gzi_mc = discrete_ident_recursive_least_squares(data, Ts, plot_ident)
 	%# INPUT Ts(float):
 	%# INPUT plot_ident(boolean):
 	%# OUTPUT Gzi_mc:
+    data_size = size(data, 1);
+    n = 3;
+    u = data.InputData;
+    y = data.OutputData;
+    Theta = zeros(4, data_size);
+    P = 1e12*eye(4);
 
+    for k = n:data_size-1
+        Phi = [-y(k-1) -y(k-2) u(k-1) u(k-2)];
+        K = P*Phi'/(1+(Phi*P*Phi')); 
+        Theta(:,k+1) = Theta(:,k)+K*(y(k)-Phi*Theta(:,k));
+        P = P-(K*Phi*P);
+    end
+    Gzi_mc = tf(Theta(3:4,data_size)', [1 Theta(1:2,data_size)'], Ts)
+
+    if plot_ident
+        figure(2);
+        subplot(2, 2, 1); plot(Theta(1, :));xlabel('Tiempo [s]'); grid
+        set(gca, 'XTickLabel', 0:10:data_size); ylabel('a_1')
+        subplot(2, 2, 2); plot(Theta(2, :)); xlabel('Tiempo [s]');grid
+        set(gca, 'XTickLabel', 0:10:data_size); ylabel('a_2')
+        subplot(2, 2, 3); plot(Theta(3, :)); xlabel('Tiempo [s]');grid
+        set(gca, 'XTickLabel', 0:10:data_size); ylabel('b_1')
+        subplot(2, 2, 4); plot(Theta(4, :)); grid
+        set(gca, 'XTickLabel', 0:10:data_size); ylabel('b_2')
+        xlabel('Tiempo [s]');
+        print -dsvg G1EJ1img2.svgend
+    end
 end
 
 function analyze_residuals(data, sys_id, sampling_frequency)
