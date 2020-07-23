@@ -61,7 +61,20 @@ function [data_ident, data_validation] = generate_ident_package(input_signal, ou
 	%# INPUT output_signal (simbólico) la señal de salida
 	%# INPUT sample_time (float) tiempo de muestreo
 	%# OUTPUT [data_ident(paquete), data_validation(paquete)]
-
+    data_size = size(input_signal);
+    ident_size = floor(data_size * ident_proportion);
+    data = iddata(output_signal, input_signal, sample_time);
+    data_ident = data(1:ident_size);
+    data_validation = data(ident_size+1:data_size);
+    
+    if plot_package
+        figure(1)
+        set(data, 'InputName', 'Entrada', 'OutputName', 'Salida')
+        plot(data(1:ident_size), 'b', data(ident_size:data_size), 'g');
+        legend('Identificación', 'Validación');
+        xlabel('Tiempo [s]'); ylabel(''); title('');
+        print -dsvg G1EJ1img1.svg
+    end
 end
 
 function Gzi = discrete_ident_arx(data, Ts, focus_mode, na, nb, nk, residual_analysis)
